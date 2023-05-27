@@ -5,19 +5,20 @@ use tauri::Manager;
 
 use std::env;
 use std::io;
+use std::io::Write;
 use std::fs;
 use std::path::Path;
 use std::collections::HashMap;
 use rand::Rng;
 use std::sync::RwLock;
 
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 use imagesize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     target: String,
-    interval: String
+    interval: u64
 }
 
 static SELECT_IMAGE: RwLock<String> = RwLock::new(String::new());
@@ -45,7 +46,6 @@ fn imageview() -> String {
             file.insert("filename", filepath.to_string());
             file.insert("width", size.width.to_string());
             file.insert("height", size.height.to_string());
-            file.insert("interval", config.interval);
             *SELECT_IMAGE.write().unwrap() = filepath.to_string();
             break;
         }
@@ -54,14 +54,32 @@ fn imageview() -> String {
     format!("{}", serde_json::to_string(&file).unwrap())
 }
 
+#[tauri::command]
+fn get_config() -> String {
+    let conf: Config = get_configjson();
+
+    format!("{}", serde_json::to_string(&conf).unwrap())
+}
+
+#[tauri::command]
+fn set_configjson(target: String, interval: u64) {
+    let res = Config {
+        target: target,
+        interval: interval,
+    };
+    let json = serde_json::to_string(&res).unwrap();
+    let mut f = fs::File::create("slideshow.json").unwrap();
+    f.write_all(json.as_bytes()).unwrap();
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![imageview])
+        .invoke_handler(tauri::generate_handler![imageview, get_config, set_configjson])
         .setup(|app| {
             let app_handle = app.app_handle();
-            let config = get_configjson();
-            let interval: u64 = config.interval.parse().unwrap();
             std::thread::spawn(move || loop {
+                let config = get_configjson();
+                let interval: u64 = config.interval;
                 app_handle.emit_all("imageview", imageview()).unwrap();
                 std::thread::sleep(std::time::Duration::from_secs(interval));
             });
@@ -89,7 +107,7 @@ fn get_configjson() -> Config {
     let file = fs::read_to_string("slideshow.json");
     let mut res = Config {
         target: String::from(""),
-        interval: String::from("30"),
+        interval: 30,
     };
 
     match file {

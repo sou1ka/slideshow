@@ -9,6 +9,21 @@
   </head>
 
   <body>
+    <div id="drawer" class="Drawer js-drawer" aria-expanded="false">
+      <div class="Drawer-backdrop js-backdrop"></div>
+      <nav class="Drawer-nav Nav">
+        <h1>Slideshow Settings</h1>
+        <div class="field">
+          <label>Image path</label>
+          <input type="text" name="path" readonly="readonly" />
+          <button name="pathselect"><img src="./assets/folder_open.png" width="16" height="16" /></button>
+        </div>
+        <div class="field">
+          <label>Refresh interval(sec)</label>
+          <input type="number" name="interval" min="0" max="9999" />
+        </div>
+      </nav>
+    </div>
     <div class="container"><img src="" class="view" /><p class="text">test</p></div>
   </body>
 </html>
