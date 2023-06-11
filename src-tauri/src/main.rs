@@ -2,6 +2,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use tauri::Manager;
+use tauri::LogicalSize;
+use tauri::Size;
 
 use std::env;
 use std::io;
@@ -18,7 +20,10 @@ use imagesize;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     target: String,
-    interval: u64
+    interval: u64,
+    viewfilename: bool,
+    width: u32,
+    height: u32
 }
 
 static SELECT_IMAGE: RwLock<String> = RwLock::new(String::new());
@@ -62,10 +67,13 @@ fn get_config() -> String {
 }
 
 #[tauri::command]
-fn set_configjson(target: String, interval: u64) {
+fn set_configjson(target: String, interval: u64, viewfilename: bool, width: u32, height: u32) {
     let res = Config {
         target: target,
         interval: interval,
+        viewfilename: viewfilename,
+        width: width,
+        height: height
     };
     let json = serde_json::to_string(&res).unwrap();
     let mut f = fs::File::create("slideshow.json").unwrap();
@@ -76,6 +84,10 @@ fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![imageview, get_config, set_configjson])
         .setup(|app| {
+            let config = get_configjson();
+            let window = app.app_handle().get_window("main").unwrap();
+            window.set_size(Size::Logical(LogicalSize { width: config.width as f64, height: config.height as f64})).unwrap();
+
             let app_handle = app.app_handle();
             std::thread::spawn(move || loop {
                 let config = get_configjson();
@@ -108,6 +120,9 @@ fn get_configjson() -> Config {
     let mut res = Config {
         target: String::from(""),
         interval: 30,
+        viewfilename: false,
+        width: 800,
+        height: 600
     };
 
     match file {
@@ -115,6 +130,9 @@ fn get_configjson() -> Config {
             let tmp: Config = serde_json::from_str(&val).unwrap();
             res.target = tmp.target;
             res.interval = tmp.interval;
+            res.viewfilename = tmp.viewfilename;
+            res.width = tmp.width;
+            res.height = tmp.height;
         },
         Err(_) => {},
     }

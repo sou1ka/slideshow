@@ -7,6 +7,7 @@ let img;
 let text;
 let config;
 let interval;
+let viewfilename;
 let aspect;
 let drawerOpen = false;
 let tid;
@@ -15,6 +16,13 @@ async function setConfig() {
   let con = await invoke("get_config");
   config = JSON.parse(con);
   interval = (Number(config.interval)-0.4) * 1000;
+  viewfilename = Boolean(config.viewfilename);
+
+  if(viewfilename) {
+    text.style.display = 'block';
+  } else {
+    text.style.display = 'none';
+  }
 }
 
 async function setImage(imageview) {
@@ -50,6 +58,12 @@ async function setIntervalValue(v, silent) {
   if(silent !== true) { t.dispatchEvent(new Event('change')); }
 }
 
+async function setViewfilenameValue(v, silent) {
+  let t = document.querySelector('input[name=viewfilename]');
+  t.checked = v;
+  if(silent !== true) { t.dispatchEvent(new Event('change')); }
+}
+
 async function selectImagepath() {
   const selected = await open({
     directory: true,
@@ -67,7 +81,10 @@ async function selectImagepath() {
 async function saveImagepath(silent) {
   await invoke('set_configjson', {
     target: document.querySelector('input[name=path]').value,
-    interval: Number(document.querySelector('input[name=interval]').value)
+    interval: Number(document.querySelector('input[name=interval]').value),
+    viewfilename: Boolean(document.querySelector('input[name=viewfilename]').checked),
+    width: window.innerWidth,
+    height: window.innerHeight
   });
 
   setConfig();
@@ -114,6 +131,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   await setConfig();
   setIntervalValue(config.interval, true);
   setImagepathValue(config.target, true);
+  setViewfilenameValue(config.viewfilename, true);
 
   if(!config.target) {
     openDrawer();
@@ -124,6 +142,19 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 window.addEventListener('resize', setImageSize);
+
+(function() {
+  let timer = 0;
+  window.addEventListener('resize', function() {
+    if(timer > 0) {
+      this.clearTimeout(timer);
+    }
+
+    timer = setTimeout(function() {
+      saveImagepathSilent();
+    }, 200);
+  });
+})();
 
 document.addEventListener('keydown', function(e) {
   if(e.key == 'F5' || (e.ctrlKey && e.key == 'r')) {
@@ -136,6 +167,7 @@ document.querySelector('button[name=pathselect]').addEventListener('click', sele
 document.querySelector('input[name=path]').addEventListener('click', selectImagepath);
 document.querySelector('input[name=path]').addEventListener('change', saveImagepath);
 document.querySelector('input[name=interval]').addEventListener('change', saveImagepathSilent);
+document.querySelector('input[name=viewfilename]').addEventListener('change', saveImagepathSilent);
 document.addEventListener('selectstart', function(e) {
   e.preventDefault();
   e.stopPropagation();
