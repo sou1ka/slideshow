@@ -2,26 +2,32 @@ const { listen } = window.__TAURI__.event;
 const { invoke, convertFileSrc } = window.__TAURI__.tauri;
 const { open } = window.__TAURI__.dialog;
 const { appDir } = window.__TAURI__.path;
+const { appWindow } = window.__TAURI__.window;
 
 let img;
 let text;
 let config;
 let interval;
 let viewfilename;
+let viewfilenametitle;
 let aspect;
 let drawerOpen = false;
 let tid;
+let appTitle;
 
 async function setConfig() {
   let con = await invoke("get_config");
   config = JSON.parse(con);
   interval = (Number(config.interval)-0.4) * 1000;
   viewfilename = Boolean(config.viewfilename);
+  viewfilenametitle = Boolean(config.viewfilenametitle);
 
-  if(viewfilename) {
-    text.style.display = 'block';
+  setFilename();
+
+  if(Boolean(config.alwaystop)) {
+    appWindow.setAlwaysOnTop(true);
   } else {
-    text.style.display = 'none';
+    appWindow.setAlwaysOnTop(false);
   }
 }
 
@@ -33,7 +39,8 @@ async function setImage(imageview) {
 
   aspect = imageview.width/imageview.height;
   img.src = convertFileSrc(imageview.filename);
-  text.textContent = imageview.filename;
+  text.textContent = imageview.filename.split(/[\\\/]/g).pop();
+  setFilename();
 }
 
 async function setImageSize() {
@@ -43,6 +50,20 @@ async function setImageSize() {
   } else {
     img.style.width = 'auto';
     img.style.height = '100vh';
+  }
+}
+
+async function setFilename() {
+  if(viewfilename) {
+    text.style.display = 'block';
+  } else {
+    text.style.display = 'none';
+  }
+
+  if(viewfilenametitle) {
+    appWindow.setTitle(text.textContent + '- ' + appTitle);
+  } else {
+    appWindow.setTitle(appTitle);
   }
 }
 
@@ -60,6 +81,18 @@ async function setIntervalValue(v, silent) {
 
 async function setViewfilenameValue(v, silent) {
   let t = document.querySelector('input[name=viewfilename]');
+  t.checked = v;
+  if(silent !== true) { t.dispatchEvent(new Event('change')); }
+}
+
+async function setViewfilenametitleValue(v, silent) {
+  let t = document.querySelector('input[name=viewfilenametitle]');
+  t.checked = v;
+  if(silent !== true) { t.dispatchEvent(new Event('change')); }
+}
+
+async function setAlwaystopValue(v, silent) {
+  let t = document.querySelector('input[name=alwaystop]');
   t.checked = v;
   if(silent !== true) { t.dispatchEvent(new Event('change')); }
 }
@@ -83,8 +116,10 @@ async function saveImagepath(silent) {
     target: document.querySelector('input[name=path]').value,
     interval: Number(document.querySelector('input[name=interval]').value),
     viewfilename: Boolean(document.querySelector('input[name=viewfilename]').checked),
-    width: window.innerWidth,
-    height: window.innerHeight
+    viewfilenametitle: Boolean(document.querySelector('input[name=viewfilenametitle]').checked),
+    alwaystop: Boolean(document.querySelector('input[name=alwaystop]').checked),
+    width: (await appWindow.isFullscreen() || await appWindow.isMaximized() ? 0 : window.innerWidth),
+    height: (await appWindow.isFullscreen() || await appWindow.isMaximized() ? 0 : window.innerHeight)
   });
 
   setConfig();
@@ -110,6 +145,7 @@ async function startSlideshow() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
+  appTitle = await appWindow.title();
   img = document.querySelector('img.view');
   text = document.querySelector('p.text');
   img.addEventListener('load', () => {
@@ -132,6 +168,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   setIntervalValue(config.interval, true);
   setImagepathValue(config.target, true);
   setViewfilenameValue(config.viewfilename, true);
+  setViewfilenametitleValue(config.viewfilenametitle, true);
+  setAlwaystopValue(config.viewfilename, true);
 
   if(!config.target) {
     openDrawer();
@@ -156,10 +194,29 @@ window.addEventListener('resize', setImageSize);
   });
 })();
 
-document.addEventListener('keydown', function(e) {
-  if(e.key == 'F5' || (e.ctrlKey && e.key == 'r')) {
+document.addEventListener('keydown', async function(e) {
+  if(e.key == 'F5' || (e.ctrlKey && e.key == 'r') || e.key == 'F7') {
     e.preventDefault();
     e.stopPropagation();
+
+  } else if(e.altKey && e.key == 'Enter') {
+    appWindow.toggleMaximize();
+
+  } else if(e.key == 'F11') {
+    if(await appWindow.isFullscreen()) {
+      appWindow.setDecorations(true);
+      appWindow.setTitle(true);
+      appWindow.setFullscreen(false);
+    } else {
+      appWindow.setDecorations(false);
+      appWindow.setTitle(false);
+      appWindow.setFullscreen(true);
+    }
+ 
+  } else if(e.key == 'Escape') {
+    appWindow.setFullscreen(false);
+    appWindow.setDecorations(true);
+    appWindow.setTitle(true);
   }
 });
 
@@ -168,6 +225,8 @@ document.querySelector('input[name=path]').addEventListener('click', selectImage
 document.querySelector('input[name=path]').addEventListener('change', saveImagepath);
 document.querySelector('input[name=interval]').addEventListener('change', saveImagepathSilent);
 document.querySelector('input[name=viewfilename]').addEventListener('change', saveImagepathSilent);
+document.querySelector('input[name=viewfilenametitle]').addEventListener('change', saveImagepathSilent);
+document.querySelector('input[name=alwaystop]').addEventListener('change', saveImagepathSilent);
 document.addEventListener('selectstart', function(e) {
   e.preventDefault();
   e.stopPropagation();

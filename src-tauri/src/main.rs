@@ -22,6 +22,8 @@ pub struct Config {
     target: String,
     interval: u64,
     viewfilename: bool,
+    viewfilenametitle: bool,
+    alwaystop: bool,
     width: u32,
     height: u32
 }
@@ -67,13 +69,24 @@ fn get_config() -> String {
 }
 
 #[tauri::command]
-fn set_configjson(target: String, interval: u64, viewfilename: bool, width: u32, height: u32) {
+fn set_configjson(target: String, interval: u64, viewfilename: bool, viewfilenametitle: bool, alwaystop: bool, width: u32, height: u32) {
+    let mut w = width;
+    let mut h = height;
+
+    if width == 0 || height == 0 {
+        let conf: Config = get_configjson();
+        w = conf.width;
+        h = conf.height;
+    }
+
     let res = Config {
         target: target,
         interval: interval,
         viewfilename: viewfilename,
-        width: width,
-        height: height
+        viewfilenametitle: viewfilenametitle,
+        alwaystop: alwaystop,
+        width: w,
+        height: h
     };
     let json = serde_json::to_string(&res).unwrap();
     let mut f = fs::File::create("slideshow.json").unwrap();
@@ -121,6 +134,8 @@ fn get_configjson() -> Config {
         target: String::from(""),
         interval: 30,
         viewfilename: false,
+        viewfilenametitle: false,
+        alwaystop: false,
         width: 800,
         height: 600
     };
@@ -131,6 +146,8 @@ fn get_configjson() -> Config {
             res.target = tmp.target;
             res.interval = tmp.interval;
             res.viewfilename = tmp.viewfilename;
+            res.viewfilenametitle = tmp.viewfilenametitle;
+            res.alwaystop = tmp.alwaystop;
             res.width = tmp.width;
             res.height = tmp.height;
         },
