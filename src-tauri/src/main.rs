@@ -24,6 +24,7 @@ pub struct Config {
     viewfilename: bool,
     viewfilenametitle: bool,
     alwaystop: bool,
+    bgcolor: String,
     width: u32,
     height: u32
 }
@@ -69,7 +70,7 @@ fn get_config() -> String {
 }
 
 #[tauri::command]
-fn set_configjson(target: String, interval: u64, viewfilename: bool, viewfilenametitle: bool, alwaystop: bool, width: u32, height: u32) {
+fn set_configjson(target: String, interval: u64, viewfilename: bool, viewfilenametitle: bool, alwaystop: bool, bgcolor: String, width: u32, height: u32) {
     let mut w = width;
     let mut h = height;
 
@@ -85,6 +86,7 @@ fn set_configjson(target: String, interval: u64, viewfilename: bool, viewfilenam
         viewfilename: viewfilename,
         viewfilenametitle: viewfilenametitle,
         alwaystop: alwaystop,
+        bgcolor: bgcolor,
         width: w,
         height: h
     };
@@ -98,7 +100,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![imageview, get_config, set_configjson])
         .setup(|app| {
             let config = get_configjson();
-            let window = app.app_handle().get_window("main").unwrap();
+            let window = app.app_handle().get_window("slideshow").unwrap();
             window.set_size(Size::Logical(LogicalSize { width: config.width as f64, height: config.height as f64})).unwrap();
 
             let app_handle = app.app_handle();
@@ -136,6 +138,7 @@ fn get_configjson() -> Config {
         viewfilename: false,
         viewfilenametitle: false,
         alwaystop: false,
+        bgcolor: "f6f6f6".to_owned(),
         width: 800,
         height: 600
     };
@@ -148,6 +151,7 @@ fn get_configjson() -> Config {
             res.viewfilename = tmp.viewfilename;
             res.viewfilenametitle = tmp.viewfilenametitle;
             res.alwaystop = tmp.alwaystop;
+            res.bgcolor = tmp.bgcolor;
             res.width = tmp.width;
             res.height = tmp.height;
         },

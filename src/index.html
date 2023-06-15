@@ -12,33 +12,86 @@
     <div id="drawer" class="Drawer js-drawer" aria-expanded="false">
       <div class="Drawer-backdrop js-backdrop"></div>
       <nav class="Drawer-nav Nav">
-        <h1>Slideshow Settings</h1>
-        <div class="field">
-          <label>Image path</label>
-          <input type="text" name="path" readonly="readonly" />
-          <button name="pathselect"><img src="./assets/folder_open.png" width="16" height="16" /></button>
-        </div>
-        <div class="field">
-          <label>Refresh interval(sec)</label>
-          <input type="number" name="interval" min="0" max="9999" />
-        </div>
-        <div class="field">
-          <label>View Filename(Watermark)</label>
-          <label class="toggle-button">
-              <input type="checkbox" name="viewfilename" />
-          </label>
-        </div>
-        <div class="field">
-          <label>View Filename(Title bar)</label>
-          <label class="toggle-button">
-              <input type="checkbox" name="viewfilenametitle" />
-          </label>
-        </div>
-        <div class="field">
-          <label>Always Top</label>
-          <label class="toggle-button">
-              <input type="checkbox" name="alwaystop" />
-          </label>
+        <div>
+          <h1>Slideshow Settings</h1>
+          <div class="field">
+            <label>Image path</label>
+            <input type="text" name="path" readonly="readonly" />
+            <button name="pathselect"><img src="./assets/folder_open.png" width="16" height="16" /></button>
+          </div>
+          <div class="field">
+            <label>Refresh interval(sec)</label>
+            <input type="number" name="interval" min="0" max="9999" />
+          </div>
+          <div class="field">
+            <label>View Filename(Watermark)</label>
+            <label class="toggle-button">
+                <input type="checkbox" name="viewfilename" />
+            </label>
+          </div>
+          <div class="field">
+            <label>View Filename(Title bar)</label>
+            <label class="toggle-button">
+                <input type="checkbox" name="viewfilenametitle" />
+            </label>
+          </div>
+          <div class="field">
+            <label>Always Top</label>
+            <label class="toggle-button">
+                <input type="checkbox" name="alwaystop" />
+            </label>
+          </div>
+          <div class="field">
+            <label>BG Color</label>
+            <input type="hidden" name="bgcolor" />
+            <div class="bgcolor">
+              <label style="background-color: #f6f6f6;">
+                <input type="radio" name="colorselect" value="#f6f6f6" />
+              </label>
+              <label style="background-color: #2f2f2f;">
+                <input type="radio" name="colorselect" value="#2f2f2f" />
+              </label>
+              <label style="background-color: #ff8c00;">
+                <input type="radio" name="colorselect" value="#ff8c00" />
+              </label>
+              <label style="background-color: #e81123;">
+                <input type="radio" name="colorselect" value="#e81123" />
+              </label>
+              <label style="background-color: #bf0077;">
+                <input type="radio" name="colorselect" value="#bf0077" />
+              </label>
+              <label style="background-color: #7ffda9;">
+                <input type="radio" name="colorselect" value="#7ffda9" />
+              </label>
+              <label style="background-color: #018574;">
+                <input type="radio" name="colorselect" value="#018574" />
+              </label>
+              <label style="background-color: #0063b1;">
+                <input type="radio" name="colorselect" value="#0063b1" />
+              </label>
+              <label style="background-color: #6b69d6;">
+                <input type="radio" name="colorselect" value="#6b69d6" />
+              </label>
+              <label style="background-color: #8764b8;">
+                <input type="radio" name="colorselect" value="#8764b8" />
+              </label>
+              <label style="background-color: #486860;">
+                <input type="radio" name="colorselect" value="#486860" />
+              </label>
+              <label style="background-color: #7e735f;">
+                <input type="radio" name="colorselect" value="#7e735f" />
+              </label>
+              <label style="background-color: #4c4a48;">
+                <input type="radio" name="colorselect" value="#4c4a48" />
+              </label>
+              <label style="background-color: #000000;">
+                <input type="radio" name="colorselect" value="#000000" />
+              </label>
+              <label style="background-image: url(./assets/transparent.png);">
+                <input type="radio" name="colorselect" value="transparent" />
+              </label>
+            </div>
+          </div>
         </div>
       </nav>
     </div>

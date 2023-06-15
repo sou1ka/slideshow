@@ -14,6 +14,7 @@ let aspect;
 let drawerOpen = false;
 let tid;
 let appTitle;
+let bgcolor;
 
 async function setConfig() {
   let con = await invoke("get_config");
@@ -21,8 +22,10 @@ async function setConfig() {
   interval = (Number(config.interval)-0.4) * 1000;
   viewfilename = Boolean(config.viewfilename);
   viewfilenametitle = Boolean(config.viewfilenametitle);
+  bgcolor = config.bgcolor || '#f6f6f6';
 
   setFilename();
+  setBgColor();
 
   if(Boolean(config.alwaystop)) {
     appWindow.setAlwaysOnTop(true);
@@ -67,6 +70,10 @@ async function setFilename() {
   }
 }
 
+async function setBgColor() {
+  document.body.style.backgroundColor = bgcolor;
+}
+
 async function setImagepathValue(v, silent) {
   let t = document.querySelector('input[name=path]');
   t.value = v;
@@ -97,6 +104,12 @@ async function setAlwaystopValue(v, silent) {
   if(silent !== true) { t.dispatchEvent(new Event('change')); }
 }
 
+async function setBgcolorValue(v, silent) {
+  let t = document.querySelector('input[name=bgcolor]');
+  t.value = v;
+  if(silent !== true) { t.dispatchEvent(new Event('change')); }
+}
+
 async function selectImagepath() {
   const selected = await open({
     directory: true,
@@ -118,6 +131,7 @@ async function saveImagepath(silent) {
     viewfilename: Boolean(document.querySelector('input[name=viewfilename]').checked),
     viewfilenametitle: Boolean(document.querySelector('input[name=viewfilenametitle]').checked),
     alwaystop: Boolean(document.querySelector('input[name=alwaystop]').checked),
+    bgcolor: document.querySelector('input[name=bgcolor]').value,
     width: (await appWindow.isFullscreen() || await appWindow.isMaximized() ? 0 : window.innerWidth),
     height: (await appWindow.isFullscreen() || await appWindow.isMaximized() ? 0 : window.innerHeight)
   });
@@ -170,6 +184,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   setViewfilenameValue(config.viewfilename, true);
   setViewfilenametitleValue(config.viewfilenametitle, true);
   setAlwaystopValue(config.viewfilename, true);
+  setBgcolorValue(config.bgcolor, true);
+  
+  let iid = setInterval(function() {
+    document.body.style.transition = 'all 0.5s ease-out';
+    clearInterval(iid);
+  }, 500);
 
   if(!config.target) {
     openDrawer();
@@ -227,10 +247,18 @@ document.querySelector('input[name=interval]').addEventListener('change', saveIm
 document.querySelector('input[name=viewfilename]').addEventListener('change', saveImagepathSilent);
 document.querySelector('input[name=viewfilenametitle]').addEventListener('change', saveImagepathSilent);
 document.querySelector('input[name=alwaystop]').addEventListener('change', saveImagepathSilent);
+document.querySelector('input[name=bgcolor]').addEventListener('change', saveImagepathSilent);
 document.addEventListener('selectstart', function(e) {
   e.preventDefault();
   e.stopPropagation();
 });
+
+let col = document.querySelectorAll('input[name=colorselect]');
+for(let i = 0, size = col.length; i < size; i++) {
+  col[i].addEventListener('change', function() {
+    setBgcolorValue(this.value, false);
+  });
+}
 
 (function () {
   const drawer = document.querySelector(".js-drawer");

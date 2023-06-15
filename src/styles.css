@@ -10,7 +10,6 @@
   font-weight: 400;
 
   color: #0f0f0f;
-  background-color: #f6f6f6;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -75,13 +74,16 @@ body {
   top: 0;
   right: 0;
   height: 100%;
-  width: 280px;
+  width: 360px;
 }
 
 .Nav {
   overflow: auto;
   background: #eee;
-  padding: 40px;
+}
+
+.Nav > div {
+  margin: 40px;
 }
 
 .Drawer[aria-expanded] {
@@ -127,6 +129,7 @@ body {
 
 h1 {
   font-weight: bold;
+  margin-top: 0;
 }
 
 label {
@@ -203,10 +206,35 @@ input[type=number]::-webkit-outer-spin-button {
   display: none;
 }
 
+.bgcolor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bgcolor label {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin-top: 0;
+  border: 2px solid #0e0e0e;
+}
+
+.bgcolor label:hover {
+  border: 2px solid #6f6f6f;
+}
+
+.bgcolor input {
+  display: none;
+}
+
+.bgcolor label:after {
+  content: '';
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
-    background-color: #2f2f2f;
   }
 
   .Nav {
@@ -217,5 +245,13 @@ input[type=number]::-webkit-outer-spin-button {
   input {
     color: #fff;
     background-color: #4a4a4a;
+  }
+
+  .colorselect label {
+    border: 2px solid #606060;
+  }
+
+  .colorselect label:hover {
+    border: 2px solid #afafaf;
   }
 }
