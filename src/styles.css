@@ -3,6 +3,11 @@
 	src: url("assets/migu-1c-regular.ttf");
 }
 
+@font-face {
+	font-family: 'Migu1C-bold';
+	src: url("assets/migu-1c-bold.ttf");
+}
+
 :root {
   font-family: Migu1C, sans-serif;
   font-size: 16px;
@@ -128,7 +133,7 @@ body {
 }
 
 h1 {
-  font-weight: bold;
+  font-family: Migu1C-bold;
   margin-top: 0;
 }
 
