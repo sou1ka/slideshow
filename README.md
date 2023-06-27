@@ -30,37 +30,38 @@ Alt + Enter: 最大化
 F11: フルスクリーン  
 Esc: フルスクリーン解除  
 
+---
+
 # Slideshow
 
 This is an application that randomly slideshows image files in a specified folder.
 
-## function
+## Function
 
 Right-clicking the mouse on the application displays the function settings.
 
-Image path:
+Image path:  
 Specify an image folder. Click to launch the folder selection window.
 
-Refresh interval (sec):
+Refresh interval (sec):  
 Specifies the image refresh timing in seconds.
 
-View filename (Watermark):
+View filename (Watermark):  
 Displays the file name as a watermark over the displayed image.
 
-View filename (Title bar):
+View filename (Title bar):  
 Shows the name of the file being displayed in the title bar of the application.
 
-Always top:
+Always top:  
 Pin the application to the front.
 
-BG color:
+BG color:  
 Specifies the background color of the application.
 
-## keyboard shortcuts
+## Keyboard shortcuts
 
-Alt + Enter: Maximize
-F11: full screen
-Esc: exit full screen
+Alt + Enter: Maximize  
+F11: full screen  
+Esc: exit full screen  
 
-Developing with Tauri in vanilla HTML, CSS and Javascript.
-
+This template should help get you started developing with Tauri in vanilla HTML, CSS and Javascript.
